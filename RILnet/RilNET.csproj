@@ -52,12 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Callbacks.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ErrorClass.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Maxlenghts.cs" />
     <Compile Include="Notifications.cs" />
+    <Compile Include="OperatorInfo.cs" />
+    <Compile Include="OperatorNames.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Structures.cs" />

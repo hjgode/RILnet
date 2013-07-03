@@ -26,16 +26,16 @@ namespace RILnetDemo
 
         void rilTest_onRILnetMessage(object sender, RILtest.RILnetEventArgs e)
         {
-            addLog(e.Message);
             if (e.Status == (int)RILtest.RILnotiType.preferredListReady)
             {
                 //if (lstOPNames.Items.Count > 0)
                 //    lstOPNames.Items.Clear();
                 try
                 {
-                    for (int idx=0; idx<rilTest._preferredOPlist.Length; idx++)// RilNET.RILOPERATORINFO oi in rilTest._preferredOPlist)
+                    List<RilNET.OperatorInfo> oiList = (List<RilNET.OperatorInfo>)e._object;
+                    foreach (RilNET.OperatorInfo oi in oiList)
                     {
-                        addItem(rilTest._preferredOPlist[idx].ronNames.GetLongName());
+                        addItem(oi);
                     }
                 }
                 catch (Exception ex)
@@ -43,6 +43,13 @@ namespace RILnetDemo
                     System.Diagnostics.Debug.WriteLine("Exception: " + ex.Message);
                 }
             }
+            else if (e.Status == (int)RILtest.RILnotiType.currentOperator)
+                addLog("Current Operator='" + (string)e._object + "'");
+            else if (e.Status == (int)RILtest.RILnotiType.CellTowerInfo)
+                addLog(e.Message);
+            else
+                addLog(e.Message);
+
         }
         delegate void SetListAddCallback(object o);
         public void addItem(object o)
@@ -93,6 +100,22 @@ namespace RILnetDemo
         private void btnPreferredOperator_Click(object sender, EventArgs e)
         {
             rilTest.getPreferredOperatorList();
+        }
+
+        private void btnSetOP_Click(object sender, EventArgs e)
+        {
+            if (lstOPNames.SelectedIndex < 0)
+                return;
+            RilNET.OperatorInfo oi = (RilNET.OperatorInfo)lstOPNames.SelectedItem;
+            rilTest.registerOnNetwork(RilNET.RIL_OPSELMODE.MANUAL, oi.ronNames);
+        }
+
+        private void btnGetOperator_Click(object sender, EventArgs e)
+        {
+            if (rilTest.getCurrentOperator())
+                addLog("getCurrentOperator() request OK\n");
+            else
+                addLog("getCurrentOperator() request FAILED\n");
         }
     }
 }

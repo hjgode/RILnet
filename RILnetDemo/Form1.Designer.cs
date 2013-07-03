@@ -36,23 +36,31 @@
             this.btnPreferredOperator = new System.Windows.Forms.Button();
             this.lstOPNames = new System.Windows.Forms.ListBox();
             this.btnSetOP = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnGetOperator = new System.Windows.Forms.Button();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtLog
             // 
             this.txtLog.AcceptsReturn = true;
             this.txtLog.AcceptsTab = true;
-            this.txtLog.Location = new System.Drawing.Point(1, 152);
+            this.txtLog.Location = new System.Drawing.Point(7, 32);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
-            this.txtLog.Size = new System.Drawing.Size(238, 113);
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtLog.Size = new System.Drawing.Size(223, 210);
             this.txtLog.TabIndex = 0;
             this.txtLog.WordWrap = false;
             // 
             // btnTest
             // 
-            this.btnTest.Location = new System.Drawing.Point(10, 10);
+            this.btnTest.Location = new System.Drawing.Point(7, 7);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(101, 24);
             this.btnTest.TabIndex = 1;
@@ -61,7 +69,7 @@
             // 
             // btnGetOpInfos
             // 
-            this.btnGetOpInfos.Location = new System.Drawing.Point(128, 10);
+            this.btnGetOpInfos.Location = new System.Drawing.Point(125, 7);
             this.btnGetOpInfos.Name = "btnGetOpInfos";
             this.btnGetOpInfos.Size = new System.Drawing.Size(101, 24);
             this.btnGetOpInfos.TabIndex = 1;
@@ -70,7 +78,7 @@
             // 
             // btnPreferredOperator
             // 
-            this.btnPreferredOperator.Location = new System.Drawing.Point(128, 40);
+            this.btnPreferredOperator.Location = new System.Drawing.Point(7, 55);
             this.btnPreferredOperator.Name = "btnPreferredOperator";
             this.btnPreferredOperator.Size = new System.Drawing.Size(101, 24);
             this.btnPreferredOperator.TabIndex = 1;
@@ -79,18 +87,62 @@
             // 
             // lstOPNames
             // 
-            this.lstOPNames.Location = new System.Drawing.Point(10, 88);
+            this.lstOPNames.Location = new System.Drawing.Point(7, 85);
             this.lstOPNames.Name = "lstOPNames";
-            this.lstOPNames.Size = new System.Drawing.Size(98, 58);
+            this.lstOPNames.Size = new System.Drawing.Size(217, 128);
             this.lstOPNames.TabIndex = 2;
             // 
             // btnSetOP
             // 
-            this.btnSetOP.Location = new System.Drawing.Point(128, 88);
+            this.btnSetOP.Location = new System.Drawing.Point(125, 219);
             this.btnSetOP.Name = "btnSetOP";
             this.btnSetOP.Size = new System.Drawing.Size(99, 23);
             this.btnSetOP.TabIndex = 3;
             this.btnSetOP.Text = "set operator";
+            this.btnSetOP.Click += new System.EventHandler(this.btnSetOP_Click);
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(240, 268);
+            this.tabControl1.TabIndex = 4;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.tabPage1.Controls.Add(this.btnTest);
+            this.tabPage1.Controls.Add(this.btnGetOperator);
+            this.tabPage1.Controls.Add(this.btnSetOP);
+            this.tabPage1.Controls.Add(this.btnGetOpInfos);
+            this.tabPage1.Controls.Add(this.lstOPNames);
+            this.tabPage1.Controls.Add(this.btnPreferredOperator);
+            this.tabPage1.Location = new System.Drawing.Point(0, 0);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Size = new System.Drawing.Size(240, 245);
+            this.tabPage1.Text = "operator";
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabPage2.Controls.Add(this.txtLog);
+            this.tabPage2.Location = new System.Drawing.Point(0, 0);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Size = new System.Drawing.Size(240, 245);
+            this.tabPage2.Text = "log";
+            // 
+            // btnGetOperator
+            // 
+            this.btnGetOperator.Location = new System.Drawing.Point(9, 219);
+            this.btnGetOperator.Name = "btnGetOperator";
+            this.btnGetOperator.Size = new System.Drawing.Size(99, 23);
+            this.btnGetOperator.TabIndex = 3;
+            this.btnGetOperator.Text = "get operator";
+            this.btnGetOperator.Click += new System.EventHandler(this.btnGetOperator_Click);
             // 
             // Form1
             // 
@@ -98,17 +150,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(240, 268);
-            this.Controls.Add(this.btnSetOP);
-            this.Controls.Add(this.lstOPNames);
-            this.Controls.Add(this.btnPreferredOperator);
-            this.Controls.Add(this.btnGetOpInfos);
-            this.Controls.Add(this.btnTest);
-            this.Controls.Add(this.txtLog);
+            this.Controls.Add(this.tabControl1);
             this.Menu = this.mainMenu1;
             this.MinimizeBox = false;
             this.Name = "Form1";
             this.Text = "RILnet Demo";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.Form1_Closing);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -121,6 +171,10 @@
         private System.Windows.Forms.Button btnPreferredOperator;
         private System.Windows.Forms.ListBox lstOPNames;
         private System.Windows.Forms.Button btnSetOP;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Button btnGetOperator;
     }
 }
 

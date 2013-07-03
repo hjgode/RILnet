@@ -199,7 +199,7 @@ namespace RilNET
         public static extern int RegisterOnNetwork(
             [In] IntPtr hRil,
             [In] RIL_OPSELMODE dwMode,
-            [In] RILOPERATORNAMES lpOperatorNames);
+            [In] ref RILOPERATORNAMES lpOperatorNames); //const* as other pointers have to be given by ref!
 
         /// <summary>
         /// This function removes a specified operator from the list of preferred operators.

@@ -16,6 +16,11 @@ namespace RILnetDemo
         int hr=-1;
         static IntPtr hRil=IntPtr.Zero;
 
+        string manufacturer = "";
+        string model = "";
+        string revision = "";
+        string serialNumber = "";
+
         public RILOPERATORNAMES[] _operatorNames
         {
             get { return _operatorList.ToArray(); }
@@ -26,14 +31,14 @@ namespace RILnetDemo
             get { return _operatorNamesList.ToArray(); }
         }
 
-        public RILOPERATORINFO[] _preferredOPlist
+        public OperatorInfo[] _preferredOPlist
         {
             get { return _operatorPreferredList.ToArray(); }
         }
 
         private List<RILOPERATORNAMES> _operatorList = new List<RILOPERATORNAMES>();
         private List<RILOPERATORINFO> _operatorNamesList = new List<RILOPERATORINFO>();
-        private List<RILOPERATORINFO> _operatorPreferredList = new List<RILOPERATORINFO>();
+        private List<OperatorInfo> _operatorPreferredList = new List<OperatorInfo>();
 
         public RILtest()
         {
@@ -69,17 +74,48 @@ namespace RILnetDemo
         {
             init();
 
-            hrCti = Ril.GetCellTowerInfo(hRil);
-            hrCo = Ril.GetCurrentOperator(hRil, RIL_OPFORMAT.LONG);
-            hrEi = Ril.GetEquipmentInfo(hRil);
+            getCellTowerInfo();     //hrCti = Ril.GetCellTowerInfo(hRil);
+            getCurrentOperator();   // hrCo = Ril.GetCurrentOperator(hRil, RIL_OPFORMAT.LONG);
+            getEquipmentInfo();     // hrEi = Ril.GetEquipmentInfo(hRil);
 
-            hrGetAllOperatorsList = Ril.GetAllOperatorsList(hRil);
+            getAllOperatorsList();  // hrGetAllOperatorsList = Ril.GetAllOperatorsList(hRil);
 
             //hrGetOperatorList = Ril.GetOperatorList(hRil);
 
             //hr = Ril.Deinitialize(hRil);
         }
 
+        public bool getCurrentOperator()
+        {
+            init();
+            if(hRil!=null)
+                hrCo = Ril.GetCurrentOperator(hRil, RIL_OPFORMAT.LONG);
+            if (hrCo < 0)
+                return false;
+            else
+                return true;
+        }
+
+        public void getCellTowerInfo()
+        {
+            init();
+            if(hRil!=null)
+                hrCti = Ril.GetCellTowerInfo(hRil);
+        }
+
+        public void getEquipmentInfo()
+        {
+            init();
+            if(hRil!=null)
+                hrEi = Ril.GetEquipmentInfo(hRil);
+        }
+
+        public void getAllOperatorsList()
+        {
+            init();
+            if(hRil!=null)
+                hrGetAllOperatorsList = Ril.GetAllOperatorsList(hRil);
+        }
         public void getOperatorInfoList()
         {
             init();
@@ -121,7 +157,15 @@ namespace RILnetDemo
             init();
             if (hRil == IntPtr.Zero)
                 return;
-            hrRegisterOnNetwork = Ril.RegisterOnNetwork(hRil, sMode, operatorName);
+
+            try
+            {
+                hrRegisterOnNetwork = Ril.RegisterOnNetwork(hRil, sMode, ref operatorName);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Excpetion in RegisterOnNetwork: " + ex.Message);
+            }
             if (hrRegisterOnNetwork < 0)
             {
                 string sError = RilErrorClass.getRIL_Error(hrRegisterOnNetwork);
@@ -212,7 +256,7 @@ namespace RILnetDemo
 
             if (hrRegisterOnNetwork == hrCmdID)
             {
-                OnRILmessage("set preferred Operator with index " + dwParam.ToString());
+                OnRILmessage("set preferred Operator with dwCode=" + dwCode.ToString());
             }
 
             if (hrRemovePreferredOperator == hrCmdID)
@@ -224,7 +268,7 @@ namespace RILnetDemo
             {
                 RILOPERATORINFO[] pOperInfo = getRILOPERATORINFO(lpData, cbData);
 
-                _operatorPreferredList = arrayHelper<RILOPERATORINFO>.ToList(pOperInfo);// pOperInfo.ToList();
+                _operatorPreferredList.Clear(); //arrayHelper<OperatorInfo>.ToList(new OperatorInfo(pOperInfo));// pOperInfo.ToList();
 
                 OnRILmessage("Preferred Operator List:\r\n======================\r\n");
                 foreach (RILOPERATORINFO oi in pOperInfo)
@@ -235,8 +279,9 @@ namespace RILnetDemo
                         oi.dwStatus.ToString() + "\r\n" +
                         dumpOperatorNames(oi.ronNames) +
                         "\r\n");
+                    _operatorPreferredList.Add(new OperatorInfo(oi));
                 }
-                OnRILmessage(new RILnetEventArgs("list ready", (int)RILnotiType.preferredListReady));
+                OnRILmessage(new RILnetEventArgs("list ready", (int)RILnotiType.preferredListReady, _operatorPreferredList));
             }
 
             if (hrGetAllOperatorsList == hrCmdID)   // this is the answer by the RIL to our GetAllOperatorsList request
@@ -273,6 +318,7 @@ namespace RILnetDemo
                 }
             }
 
+            //current operator
             if (hrCo == hrCmdID)
             {
                 //Ril.GetCurrentOperator
@@ -282,9 +328,10 @@ namespace RILnetDemo
                 {
                     longName = Encoding.ASCII.GetString(pOperatorNames.szLongName, 0, pOperatorNames.szLongName.Length).Replace("\0", "");
                 }
-                OnRILmessage("Operator: '" + longName +"'\r\n");
+                OnRILmessage(new RILnetEventArgs("Operator: '" + longName +"'\r\n", RILnotiType.currentOperator, longName));
             }
 
+            //cell tower info
             if (hrCti == hrCmdID)
             {
                 //Ril.GetCellTowerInfo
@@ -296,17 +343,14 @@ namespace RILnetDemo
                     "MobileCountryCode =" + pCellTowerInfo.dwMobileCountryCode.ToString() + "\r\n" +
                     "MobileNetworkCode =" + pCellTowerInfo.dwMobileNetworkCode.ToString() + "\r\n"
                     ;
-                OnRILmessage(s);
+                OnRILmessage(new RILnetEventArgs(s, RILnotiType.CellTowerInfo, pCellTowerInfo));
             }
 
             if (hrEi == hrCmdID)
             {
                 //Ril.GetEquipmentInfo
                 RILEQUIPMENTINFO pEquipmentInfo = (RILEQUIPMENTINFO)Marshal.PtrToStructure(lpData, typeof(RILEQUIPMENTINFO));
-                string manufacturer="";
-                string model="";
-                string revision = "";
-                string serialNumber = "";
+
 
                 if ((pEquipmentInfo.dwParams & RIL_PARAM_EI.MANUFACTURER) == RIL_PARAM_EI.MANUFACTURER)
                 {
@@ -398,14 +442,30 @@ namespace RILnetDemo
         {
             normal = 0,
             preferredListReady = 1,
+            currentOperator = 2,
+            RSSI = 3,
+            CellTowerInfo = 4,
         }
 
         public class RILnetEventArgs : EventArgs
         {
+            public RILnetEventArgs(string s, int iStatus, object o)
+            {
+                _msg = s;
+                _status = iStatus;
+                _object = o;
+            }
+            public RILnetEventArgs(string s, RILnotiType iStatus, object o)
+            {
+                _msg = s;
+                _status = (int)iStatus;
+                _object = o;
+            }
             public RILnetEventArgs(string s, int iStatus)
             {
                 _msg = s;
                 _status = iStatus;
+                
             }
             public RILnetEventArgs(string s)
             {
@@ -414,6 +474,7 @@ namespace RILnetDemo
             }
             private string _msg;
             private int _status;
+            public object _object;
             public string Message
             {
                 get { return _msg; }
