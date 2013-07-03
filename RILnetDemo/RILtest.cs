@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
@@ -225,7 +224,7 @@ namespace RILnetDemo
             {
                 RILOPERATORINFO[] pOperInfo = getRILOPERATORINFO(lpData, cbData);
 
-                _operatorPreferredList = pOperInfo.ToList();
+                _operatorPreferredList = arrayHelper<RILOPERATORINFO>.ToList(pOperInfo);// pOperInfo.ToList();
 
                 OnRILmessage("Preferred Operator List:\r\n======================\r\n");
                 foreach (RILOPERATORINFO oi in pOperInfo)
@@ -245,7 +244,7 @@ namespace RILnetDemo
                 //RILOPERATORNAMES pOperator = (RILOPERATORNAMES)Marshal.PtrToStructure(lpData, typeof(RILOPERATORNAMES));
                 RILOPERATORNAMES[] pOperatores = getRILOPERATORNAMES(lpData, cbData);
 
-                _operatorList = pOperatores.ToList();
+                _operatorList = arrayHelper<RILOPERATORNAMES>.ToList(pOperatores);// pOperatores.ToList();  // NETCF 3.5
 
                 OnRILmessage("OperatorList:\r\n======================\r\n");
                 foreach (RILOPERATORNAMES on in pOperatores)
@@ -260,7 +259,7 @@ namespace RILnetDemo
                 //RILOPERATORINFO pOperatorInfo = (RILOPERATORINFO)Marshal.PtrToStructure(lpData, typeof(RILOPERATORINFO));
                 RILOPERATORINFO[] pOperInfo = getRILOPERATORINFO(lpData, cbData);
 
-                _operatorNamesList = pOperInfo.ToList();
+                _operatorNamesList = arrayHelper<RILOPERATORINFO>.ToList(pOperInfo);// pOperInfo.ToList(); //NETCF 3.5
 
                 OnRILmessage("OperatorInfos:\r\n======================\r\n");
                 foreach (RILOPERATORINFO oi in pOperInfo)
@@ -377,6 +376,23 @@ namespace RILnetDemo
             }
         }
 
+        //helpers
+        /// <summary>
+        /// NETCF2 does not have array.ToList()
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        static class arrayHelper<T>
+        {
+            public static List<T> ToList(T[] arr)
+            {
+                List<T> list = new List<T>();
+                foreach (T on in arr)
+                    list.Add(on);
+                return list;
+            }
+        }
+
+        #region event_stuff
         //event stuff
         public enum RILnotiType
         {
@@ -431,7 +447,7 @@ namespace RILnetDemo
             if (onRILnetMessage != null)
                 onRILnetMessage(this, e);
         }
-
+        #endregion
     }
 }
 

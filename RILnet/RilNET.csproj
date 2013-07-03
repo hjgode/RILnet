@@ -4,22 +4,20 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EE9F7AF3-59F5-4315-8CF3-A78432C71DCB}</ProjectGuid>
+    <ProjectGuid>{740E1384-6545-4B99-9075-134F11FD962B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RilNET</RootNamespace>
     <AssemblyName>RilNET</AssemblyName>
     <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PlatformFamilyName>PocketPC</PlatformFamilyName>
-    <PlatformID>b2c48bd2-963d-4549-9169-1fa021dce484</PlatformID>
-    <OSVersion>5.2</OSVersion>
+    <PlatformID>4118C335-430C-497f-BE48-11C3316B135E</PlatformID>
+    <OSVersion>5.1</OSVersion>
     <DeployDirSuffix>RilNET</DeployDirSuffix>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <NativePlatformName>Windows Mobile 6 Professional SDK</NativePlatformName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <NativePlatformName>Windows Mobile 5.0 Pocket PC SDK</NativePlatformName>
     <FormFactorID>
     </FormFactorID>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>RilNET.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,9 +31,6 @@
     <FileAlignment>512</FileAlignment>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <DocumentationFile>
-    </DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,28 +47,21 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-    <Reference Include="System.XML" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Functions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Constants.cs" />
     <Compile Include="Callbacks.cs" />
+    <Compile Include="Class1.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="ErrorClass.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="Functions.cs" />
     <Compile Include="Maxlenghts.cs" />
     <Compile Include="Notifications.cs" />
     <Compile Include="Parameters.cs" />
-    <Compile Include="Structures.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="RilNET.snk" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structures.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
   <ProjectExtensions>
