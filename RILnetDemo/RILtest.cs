@@ -371,11 +371,11 @@ namespace RILnetDemo
                 {
                     serialNumber = Encoding.ASCII.GetString(pEquipmentInfo.szSerialNumber, 0, pEquipmentInfo.szSerialNumber.Length).Replace("\0", "");
                 }
-                OnRILmessage("Info\r\n==================\r\n" +
+                OnRILmessage(new RILnetEventArgs("Info\r\n==================\r\n" +
                     "manufacturer='" + manufacturer + "'\r\n" +
                     "model       ='" + model + "'\r\n" +
                     "revision    ='" + revision + "'\r\n" +
-                    "serialnumber='" + serialNumber + "'\r\n");
+                    "serialnumber='" + serialNumber + "'\r\n", RILnotiType.EquipmentInfo, pEquipmentInfo));
             }
         }
 
@@ -445,6 +445,7 @@ namespace RILnetDemo
             currentOperator = 2,
             RSSI = 3,
             CellTowerInfo = 4,
+            EquipmentInfo = 5,
         }
 
         public class RILnetEventArgs : EventArgs
@@ -486,27 +487,32 @@ namespace RILnetDemo
                 set { _status = value; }
             }
         }
-        public delegate void RILnetDelegate(object sender, RILnetEventArgs e);
-        public event EventHandler<RILnetEventArgs> onRILnetMessage;
+        //changed according to http://www.codeproject.com/Articles/37474/Threadsafe-Events
+        //public delegate void RILnetDelegate(object sender, RILnetEventArgs e);
+        private EventHandler<RILnetEventArgs> onRILnetMessage;
+        public event EventHandler<RILnetEventArgs> OnRILnetMessage
+        {
+            add { this.onRILnetMessage += value; }
+            remove { this.onRILnetMessage -= value; }
+        }
         protected virtual void OnRILmessageHandler(RILnetEventArgs e)
         {
-            EventHandler<RILnetEventArgs> handler = onRILnetMessage;
-            if (handler != null)
+            if (this.onRILnetMessage != null)
             {
-                handler(this, e);
+                onRILnetMessage(this, e);
             }
         }
         void OnRILmessage(string s)
         {
             Debug.Write(s);
-            if (onRILnetMessage != null)
-                onRILnetMessage(this, new RILnetEventArgs(s));
+            if (this.onRILnetMessage != null)
+                this.onRILnetMessage(this, new RILnetEventArgs(s));
         }
         void OnRILmessage(RILnetEventArgs e)
         {
             Debug.Write(e.Message);
-            if (onRILnetMessage != null)
-                onRILnetMessage(this, e);
+            if (this.onRILnetMessage != null)
+                this.onRILnetMessage(this, e);
         }
         #endregion
     }

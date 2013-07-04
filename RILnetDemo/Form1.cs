@@ -16,7 +16,8 @@ namespace RILnetDemo
         {
             InitializeComponent();
             rilTest = new RILtest();
-            rilTest.onRILnetMessage += new EventHandler<RILtest.RILnetEventArgs>(rilTest_onRILnetMessage);
+            rilTest.OnRILnetMessage += new EventHandler<RILtest.RILnetEventArgs>(rilTest_onRILnetMessage);
+            rilTest.getEquipmentInfo();
         }
 
         private void btnTest_Click(object sender, EventArgs e)
@@ -45,8 +46,10 @@ namespace RILnetDemo
             }
             else if (e.Status == (int)RILtest.RILnotiType.currentOperator)
                 addLog("Current Operator='" + (string)e._object + "'");
+            else if (e.Status == (int)RILtest.RILnotiType.EquipmentInfo)
+                addPhoneInfo(e.Message);
             else if (e.Status == (int)RILtest.RILnotiType.CellTowerInfo)
-                addLog(e.Message);
+                addPhoneInfo(e.Message);
             else
                 addLog(e.Message);
 
@@ -64,7 +67,17 @@ namespace RILnetDemo
                 lstOPNames.Items.Add(o);
             }
         }
-
+        delegate void SetTextPhoneInfoCallback(string text);
+        public void addPhoneInfo(string text)
+        {
+            if (txtPhoneInfo.InvokeRequired)
+            {
+                SetTextPhoneInfoCallback d = new SetTextPhoneInfoCallback(addPhoneInfo);
+                this.Invoke(d, new object[] { text });
+            }
+            else
+                txtPhoneInfo.Text = text;
+        }
         delegate void SetTextCallback(string text);
         public void addLog(string text)
         {
@@ -116,6 +129,16 @@ namespace RILnetDemo
                 addLog("getCurrentOperator() request OK\n");
             else
                 addLog("getCurrentOperator() request FAILED\n");
+        }
+
+        private void btnPhoneRefresh_Click(object sender, EventArgs e)
+        {
+            rilTest.getEquipmentInfo();
+        }
+
+        private void btnCellTowerInfo_Click(object sender, EventArgs e)
+        {
+            rilTest.getCellTowerInfo();
         }
     }
 }
