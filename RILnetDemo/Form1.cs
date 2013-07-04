@@ -17,6 +17,7 @@ namespace RILnetDemo
             InitializeComponent();
             rilTest = new RILtest();
             rilTest.OnRILnetMessage += new EventHandler<RILtest.RILnetEventArgs>(rilTest_onRILnetMessage);
+            rilTest.EnableNotifications(RilNET.RIL_NCLASS.ALL);
             rilTest.getEquipmentInfo();
         }
 
@@ -27,16 +28,35 @@ namespace RILnetDemo
 
         void rilTest_onRILnetMessage(object sender, RILtest.RILnetEventArgs e)
         {
-            if (e.Status == (int)RILtest.RILnotiType.preferredListReady)
+            if (e.Status == (int)RILtest.RILnotiType.preferredOperatorInfoListReady)
             {
-                //if (lstOPNames.Items.Count > 0)
-                //    lstOPNames.Items.Clear();
+                clearList();
                 try
                 {
-                    List<RilNET.OperatorInfo> oiList = (List<RilNET.OperatorInfo>)e._object;
-                    foreach (RilNET.OperatorInfo oi in oiList)
+                    if (e._object == null)
+                        return;
+                    List<RilNET.RILOPERATORINFO> oiList = (List<RilNET.RILOPERATORINFO>)e._object;
+                    foreach (RilNET.RILOPERATORINFO oi in oiList)
                     {
-                        addItem(oi);
+                        addItem(new RilNET.OperatorInfo(oi));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Exception: " + ex.Message);
+                }
+            }
+            if (e.Status == (int)RILtest.RILnotiType.operatorInfoListReady)
+            {
+                clearList();
+                try
+                {
+                    if (e._object == null)
+                        return;
+                    List<RilNET.RILOPERATORINFO> onList = (List<RilNET.RILOPERATORINFO>)e._object;
+                    foreach (RilNET.RILOPERATORINFO oi in onList)
+                    {
+                        addItem(new RilNET.OperatorInfo(oi));
                     }
                 }
                 catch (Exception ex)
@@ -45,7 +65,7 @@ namespace RILnetDemo
                 }
             }
             else if (e.Status == (int)RILtest.RILnotiType.currentOperator)
-                addLog("Current Operator='" + (string)e._object + "'");
+                addPhoneInfo(e.Message);
             else if (e.Status == (int)RILtest.RILnotiType.EquipmentInfo)
                 addPhoneInfo(e.Message);
             else if (e.Status == (int)RILtest.RILnotiType.CellTowerInfo)
@@ -67,6 +87,19 @@ namespace RILnetDemo
                 lstOPNames.Items.Add(o);
             }
         }
+
+        delegate void ClearListCallback();
+        public void clearList()
+        {
+            if (lstOPNames.InvokeRequired)
+            {
+                ClearListCallback d = new ClearListCallback(clearList);
+                this.Invoke(d, new object[] {});
+            }
+            else
+                lstOPNames.Items.Clear();
+        }
+
         delegate void SetTextPhoneInfoCallback(string text);
         public void addPhoneInfo(string text)
         {
