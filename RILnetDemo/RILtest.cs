@@ -23,22 +23,22 @@ namespace RILnetDemo
 
         public RILOPERATORNAMES[] _operatorNames
         {
-            get { return _operatorList.ToArray(); }
+            get { return _operatorNameList.ToArray(); }
         }
 
         public RILOPERATORINFO[] _operatorInfos
         {
-            get { return _operatorNamesList.ToArray(); }
+            get { return _operatorInfoList.ToArray(); }
         }
 
         public OperatorInfo[] _preferredOPlist
         {
-            get { return _operatorPreferredList.ToArray(); }
+            get { return _operatorInfoPreferredList.ToArray(); }
         }
 
-        private List<RILOPERATORNAMES> _operatorList = new List<RILOPERATORNAMES>();
-        private List<RILOPERATORINFO> _operatorNamesList = new List<RILOPERATORINFO>();
-        private List<OperatorInfo> _operatorPreferredList = new List<OperatorInfo>();
+        private List<RILOPERATORNAMES> _operatorNameList = new List<RILOPERATORNAMES>();
+        private List<RILOPERATORINFO> _operatorInfoList = new List<RILOPERATORINFO>();
+        private List<OperatorInfo> _operatorInfoPreferredList = new List<OperatorInfo>();
 
         public RILtest()
         {
@@ -83,6 +83,31 @@ namespace RILnetDemo
             //hrGetOperatorList = Ril.GetOperatorList(hRil);
 
             //hr = Ril.Deinitialize(hRil);
+        }
+
+
+        public bool EnableNotifications(RIL_NCLASS ncclass)
+        {
+            init();
+            if (hRil != IntPtr.Zero)
+                if (Ril.RIL_EnableNotifications(hRil, ncclass) > 0)
+                    return true;
+                else
+                    return false;
+            else
+                return false;
+        }
+
+        public bool DisableNotifications(RIL_NCLASS ncclass)
+        {
+            init();
+            if (hRil != IntPtr.Zero)
+                if (Ril.RIL_EnableNotifications(hRil, ncclass) > 0)
+                    return true;
+                else
+                    return false;
+            else
+                return false;
         }
 
         public bool getCurrentOperator()
@@ -268,7 +293,7 @@ namespace RILnetDemo
             {
                 RILOPERATORINFO[] pOperInfo = getRILOPERATORINFO(lpData, cbData);
 
-                _operatorPreferredList.Clear(); //arrayHelper<OperatorInfo>.ToList(new OperatorInfo(pOperInfo));// pOperInfo.ToList();
+                _operatorInfoPreferredList.Clear(); //arrayHelper<OperatorInfo>.ToList(new OperatorInfo(pOperInfo));// pOperInfo.ToList();
 
                 OnRILmessage("Preferred Operator List:\r\n======================\r\n");
                 foreach (RILOPERATORINFO oi in pOperInfo)
@@ -279,17 +304,18 @@ namespace RILnetDemo
                         oi.dwStatus.ToString() + "\r\n" +
                         dumpOperatorNames(oi.ronNames) +
                         "\r\n");
-                    _operatorPreferredList.Add(new OperatorInfo(oi));
+                    _operatorInfoPreferredList.Add(new OperatorInfo(oi));
                 }
-                OnRILmessage(new RILnetEventArgs("list ready", (int)RILnotiType.preferredListReady, _operatorPreferredList));
+                OnRILmessage(new RILnetEventArgs("list ready", (int)RILnotiType.preferredOperatorInfoListReady, _operatorInfoPreferredList));
             }
 
             if (hrGetAllOperatorsList == hrCmdID)   // this is the answer by the RIL to our GetAllOperatorsList request
             {
+                _operatorNameList.Clear();
                 //RILOPERATORNAMES pOperator = (RILOPERATORNAMES)Marshal.PtrToStructure(lpData, typeof(RILOPERATORNAMES));
                 RILOPERATORNAMES[] pOperatores = getRILOPERATORNAMES(lpData, cbData);
 
-                _operatorList = arrayHelper<RILOPERATORNAMES>.ToList(pOperatores);// pOperatores.ToList();  // NETCF 3.5
+                _operatorNameList = arrayHelper<RILOPERATORNAMES>.ToList(pOperatores);// pOperatores.ToList();  // NETCF 3.5
 
                 OnRILmessage("OperatorList:\r\n======================\r\n");
                 foreach (RILOPERATORNAMES on in pOperatores)
@@ -304,18 +330,20 @@ namespace RILnetDemo
                 //RILOPERATORINFO pOperatorInfo = (RILOPERATORINFO)Marshal.PtrToStructure(lpData, typeof(RILOPERATORINFO));
                 RILOPERATORINFO[] pOperInfo = getRILOPERATORINFO(lpData, cbData);
 
-                _operatorNamesList = arrayHelper<RILOPERATORINFO>.ToList(pOperInfo);// pOperInfo.ToList(); //NETCF 3.5
+                _operatorInfoList = arrayHelper<RILOPERATORINFO>.ToList(pOperInfo);// pOperInfo.ToList(); //NETCF 3.5
 
                 OnRILmessage("OperatorInfos:\r\n======================\r\n");
-                foreach (RILOPERATORINFO oi in pOperInfo)
+                foreach (RILOPERATORINFO oi in _operatorInfoList)
                 {
                     OnRILmessage(
-                        oi.dwIndex.ToString() + ": " +
-                        oi.dwParams.ToString() + ", " +
-                        oi.dwStatus.ToString() + "\r\n" +
-                        dumpOperatorNames(oi.ronNames) +
-                        "\r\n");
+                    oi.dwIndex.ToString() + ": " +
+                    oi.dwParams.ToString() + ", " +
+                    oi.dwStatus.ToString() + "\r\n" +
+                    dumpOperatorNames(oi.ronNames) +
+                    "\r\n");
                 }
+                OnRILmessage(new RILnetEventArgs(
+                    "OperatorInfoList ready", (int)RILnotiType.operatorInfoListReady, _operatorInfoList));
             }
 
             //current operator
@@ -371,11 +399,11 @@ namespace RILnetDemo
                 {
                     serialNumber = Encoding.ASCII.GetString(pEquipmentInfo.szSerialNumber, 0, pEquipmentInfo.szSerialNumber.Length).Replace("\0", "");
                 }
-                OnRILmessage("Info\r\n==================\r\n" +
+                OnRILmessage(new RILnetEventArgs("Info\r\n==================\r\n" +
                     "manufacturer='" + manufacturer + "'\r\n" +
                     "model       ='" + model + "'\r\n" +
                     "revision    ='" + revision + "'\r\n" +
-                    "serialnumber='" + serialNumber + "'\r\n");
+                    "serialnumber='" + serialNumber + "'\r\n", RILnotiType.EquipmentInfo, pEquipmentInfo));
             }
         }
 
@@ -441,10 +469,13 @@ namespace RILnetDemo
         public enum RILnotiType
         {
             normal = 0,
-            preferredListReady = 1,
+            preferredOperatorInfoListReady = 1,
             currentOperator = 2,
             RSSI = 3,
             CellTowerInfo = 4,
+            EquipmentInfo = 5,
+            operatorInfoListReady,
+
         }
 
         public class RILnetEventArgs : EventArgs
@@ -486,27 +517,32 @@ namespace RILnetDemo
                 set { _status = value; }
             }
         }
-        public delegate void RILnetDelegate(object sender, RILnetEventArgs e);
-        public event EventHandler<RILnetEventArgs> onRILnetMessage;
+        //changed according to http://www.codeproject.com/Articles/37474/Threadsafe-Events
+        //public delegate void RILnetDelegate(object sender, RILnetEventArgs e);
+        private EventHandler<RILnetEventArgs> onRILnetMessage;
+        public event EventHandler<RILnetEventArgs> OnRILnetMessage
+        {
+            add { this.onRILnetMessage += value; }
+            remove { this.onRILnetMessage -= value; }
+        }
         protected virtual void OnRILmessageHandler(RILnetEventArgs e)
         {
-            EventHandler<RILnetEventArgs> handler = onRILnetMessage;
-            if (handler != null)
+            if (this.onRILnetMessage != null)
             {
-                handler(this, e);
+                onRILnetMessage(this, e);
             }
         }
         void OnRILmessage(string s)
         {
             Debug.Write(s);
-            if (onRILnetMessage != null)
-                onRILnetMessage(this, new RILnetEventArgs(s));
+            if (this.onRILnetMessage != null)
+                this.onRILnetMessage(this, new RILnetEventArgs(s));
         }
         void OnRILmessage(RILnetEventArgs e)
         {
             Debug.Write(e.Message);
-            if (onRILnetMessage != null)
-                onRILnetMessage(this, e);
+            if (this.onRILnetMessage != null)
+                this.onRILnetMessage(this, e);
         }
         #endregion
     }

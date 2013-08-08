@@ -37,10 +37,15 @@
             this.lstOPNames = new System.Windows.Forms.ListBox();
             this.btnSetOP = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.btnCellTowerInfo = new System.Windows.Forms.Button();
+            this.btnPhoneRefresh = new System.Windows.Forms.Button();
+            this.txtPhoneInfo = new System.Windows.Forms.TextBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.btnGetOperator = new System.Windows.Forms.Button();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.SuspendLayout();
@@ -69,7 +74,7 @@
             // 
             // btnGetOpInfos
             // 
-            this.btnGetOpInfos.Location = new System.Drawing.Point(125, 7);
+            this.btnGetOpInfos.Location = new System.Drawing.Point(123, 55);
             this.btnGetOpInfos.Name = "btnGetOpInfos";
             this.btnGetOpInfos.Size = new System.Drawing.Size(101, 24);
             this.btnGetOpInfos.TabIndex = 1;
@@ -103,6 +108,7 @@
             // 
             // tabControl1
             // 
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -111,6 +117,46 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(240, 268);
             this.tabControl1.TabIndex = 4;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.tabPage3.Controls.Add(this.btnCellTowerInfo);
+            this.tabPage3.Controls.Add(this.btnPhoneRefresh);
+            this.tabPage3.Controls.Add(this.txtPhoneInfo);
+            this.tabPage3.Location = new System.Drawing.Point(0, 0);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(240, 245);
+            this.tabPage3.Text = "Phone";
+            // 
+            // btnCellTowerInfo
+            // 
+            this.btnCellTowerInfo.Location = new System.Drawing.Point(97, 178);
+            this.btnCellTowerInfo.Name = "btnCellTowerInfo";
+            this.btnCellTowerInfo.Size = new System.Drawing.Size(136, 25);
+            this.btnCellTowerInfo.TabIndex = 1;
+            this.btnCellTowerInfo.Text = "get Cell Tower Info";
+            this.btnCellTowerInfo.Click += new System.EventHandler(this.btnCellTowerInfo_Click);
+            // 
+            // btnPhoneRefresh
+            // 
+            this.btnPhoneRefresh.Location = new System.Drawing.Point(97, 147);
+            this.btnPhoneRefresh.Name = "btnPhoneRefresh";
+            this.btnPhoneRefresh.Size = new System.Drawing.Size(136, 25);
+            this.btnPhoneRefresh.TabIndex = 1;
+            this.btnPhoneRefresh.Text = "get equipment";
+            this.btnPhoneRefresh.Click += new System.EventHandler(this.btnPhoneRefresh_Click);
+            // 
+            // txtPhoneInfo
+            // 
+            this.txtPhoneInfo.AcceptsReturn = true;
+            this.txtPhoneInfo.AcceptsTab = true;
+            this.txtPhoneInfo.Location = new System.Drawing.Point(7, 7);
+            this.txtPhoneInfo.Multiline = true;
+            this.txtPhoneInfo.Name = "txtPhoneInfo";
+            this.txtPhoneInfo.ReadOnly = true;
+            this.txtPhoneInfo.Size = new System.Drawing.Size(226, 134);
+            this.txtPhoneInfo.TabIndex = 0;
             // 
             // tabPage1
             // 
@@ -126,15 +172,6 @@
             this.tabPage1.Size = new System.Drawing.Size(240, 245);
             this.tabPage1.Text = "operator";
             // 
-            // tabPage2
-            // 
-            this.tabPage2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabPage2.Controls.Add(this.txtLog);
-            this.tabPage2.Location = new System.Drawing.Point(0, 0);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(240, 245);
-            this.tabPage2.Text = "log";
-            // 
             // btnGetOperator
             // 
             this.btnGetOperator.Location = new System.Drawing.Point(9, 219);
@@ -143,6 +180,15 @@
             this.btnGetOperator.TabIndex = 3;
             this.btnGetOperator.Text = "get operator";
             this.btnGetOperator.Click += new System.EventHandler(this.btnGetOperator_Click);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabPage2.Controls.Add(this.txtLog);
+            this.tabPage2.Location = new System.Drawing.Point(0, 0);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Size = new System.Drawing.Size(232, 242);
+            this.tabPage2.Text = "log";
             // 
             // Form1
             // 
@@ -157,6 +203,7 @@
             this.Text = "RILnet Demo";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.Form1_Closing);
             this.tabControl1.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -175,6 +222,10 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button btnGetOperator;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TextBox txtPhoneInfo;
+        private System.Windows.Forms.Button btnPhoneRefresh;
+        private System.Windows.Forms.Button btnCellTowerInfo;
     }
 }
 

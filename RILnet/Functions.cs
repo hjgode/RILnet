@@ -298,5 +298,23 @@ namespace RilNET
         public static extern int SetAudioMuting(
             [In] IntPtr hRil,
             [In, MarshalAs(UnmanagedType.Bool)] bool fEnable);
+
+        /// <summary>
+        /// This function enables additional classes of notifications for a client.
+        /// </summary>
+        /// <param name="hRil">Handle to the RIL instance returned by RIL_Initialize</param>
+        /// <param name="notificationClasses">Specifies the classes of notifications to enable. Valid values are listed in the topic Notification Class Constants.</param>
+        /// <returns>Positive HRESULT values indicate success and are used as command identifications for matching the asynchronous call result. Negative HRESULT values indicate an error. Errors are defined in the Ril.h file.</returns>
+        [DllImport("ril.dll", EntryPoint = "RIL_SetAudioMuting", SetLastError = true)]
+        public static extern int RIL_EnableNotifications([In]IntPtr hRil, [In]RIL_NCLASS notificationClasses);
+
+        /// <summary>
+        /// This function disables classes of notifications for a client.
+        /// </summary>
+        /// <param name="hRil">Handle to the RIL instance returned by RIL_Initialize.</param>
+        /// <param name="notificationClasses">Specifies the classes of notifications to disable. Valid values are listed in the topic Notification Class Constants.</param>
+        /// <returns>Positive HRESULT values indicate success and are used as command identifications for matching the asynchronous call result. Negative HRESULT values indicate an error. Errors are defined in the Ril.h file.</returns>
+        [DllImport("ril.dll", EntryPoint = "RIL_SetAudioMuting", SetLastError = true)]
+        public static extern int RIL_DisableNotifications([In]IntPtr hRil, [In]RIL_NCLASS notificationClasses);
     }
 }
