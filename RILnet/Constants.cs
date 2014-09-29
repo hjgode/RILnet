@@ -402,7 +402,23 @@ namespace RilNET
         /// <summary>
         /// Manual/automatic operator selection. If manual selection fails, automatic selection mode is entered. 
         /// </summary>
-        MANUALAUTOMATIC = 0x00000003
+        MANUALAUTOMATIC = 0x00000003,
+        AUTOMATIC_GSM =0x04,
+        MANUAL_GSM=0x05,
+        AUTOMATIC_CDMA = 0x06,
+        MANUAL_CDMA = 0x07,
+
+        /*
+        #define RIL_OPSELMODE_AUTOMATIC                     (0x00000001)      // @constdefine Automatic operator selection (GSM and/or CDMA)
+        #define RIL_OPSELMODE_MANUAL                        (0x00000002)      // @constdefine Manual operator selection (GSM and/or CDMA)
+        #define RIL_OPSELMODE_MANUALAUTOMATIC               (0x00000003)      // @constdefine Manual/automatic operator selection (GSM and/or CDMA)
+                                                                              // (if manual selection fails, automatic selection mode is entered)
+        #define RIL_OPSELMODE_AUTOMATIC_GSM                 (0x00000004)      // @constdefine GSM Only, automatic GSM operator selection
+        #define RIL_OPSELMODE_MANUAL_GSM                    (0x00000005)      // @constdefine GSM Only, manual GSM operator selection
+        #define RIL_OPSELMODE_AUTOMATIC_CDMA                (0x00000006)      // @constdefine CDMA Only, automatic CDMA operator selection
+        #define RIL_OPSELMODE_MANUAL_CDMA                   (0x00000007)      // @constdefine CDMA Only, manual CDMA operator selection
+        #define RIL_OPSELMODE_LAST_VALUE                    RIL_OPSELMODE_MANUAL_CDMA      // This is the last entry in the list.
+        */
     }
     /// <summary>
     /// constants Notification Class | Notification classes

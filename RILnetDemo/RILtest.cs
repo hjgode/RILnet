@@ -116,16 +116,31 @@ namespace RILnetDemo
             if(hRil!=null)
                 hrCo = Ril.GetCurrentOperator(hRil, RIL_OPFORMAT.LONG);
             if (hrCo < 0)
+            {
                 return false;
+            }
             else
+            {
+                requestEntry re = new requestEntry(hrCo, "getCurrentOperator");
                 return true;
+            }
         }
 
         public void getCellTowerInfo()
         {
             init();
-            if(hRil!=null)
+            if (hRil != null)
+            {
                 hrCti = Ril.GetCellTowerInfo(hRil);
+                if (hrCti > 0)
+                {
+                    requestEntry re = new requestEntry(hrCti, "get cell tower info");
+                }
+                else
+                {
+                    OnRILmessage("getCellTowerInfo FAILED!\r\n");
+                }
+            }
         }
 
         public void getEquipmentInfo()
@@ -133,6 +148,14 @@ namespace RILnetDemo
             init();
             if(hRil!=null)
                 hrEi = Ril.GetEquipmentInfo(hRil);
+            if (hrEi > 0)
+            {
+                requestEntry re = new requestEntry(hrEi, "get Equipment Info");
+            }
+            else
+            {
+                OnRILmessage("getEquipmentInfo FAILED!\r\n");
+            }
         }
 
         public void getAllOperatorsList()
@@ -140,6 +163,15 @@ namespace RILnetDemo
             init();
             if(hRil!=null)
                 hrGetAllOperatorsList = Ril.GetAllOperatorsList(hRil);
+            if (hrGetAllOperatorsList > 0)
+            {
+                requestEntry re = new requestEntry(hrGetAllOperatorsList, "get all operators");
+            }
+            else
+            {
+                OnRILmessage("GetAllOperatorsList FAILED!\r\n");
+            }
+
         }
         public void getOperatorInfoList()
         {
@@ -149,6 +181,9 @@ namespace RILnetDemo
             hrGetOperatorList = Ril.GetOperatorList(hRil);
             if (hrGetOperatorList < 0)
                 OnRILmessage("GetOperatorList FAILED!\r\n");
+            else{
+                requestEntry re = new requestEntry(hrGetOperatorList, "get operator info list");
+            }
         }
 
         public void getPreferredOperatorList()
@@ -161,6 +196,10 @@ namespace RILnetDemo
             {
                 string sError = RilErrorClass.getRIL_Error(hrGetPreferredOperatorList);
                 OnRILmessage("GetPreferredOperatorList FAILED! hResult=" + hrGetPreferredOperatorList + "\r\n");
+            }
+            else
+            {
+                requestEntry re = new requestEntry(hrGetPreferredOperatorList, "get preferred operator list");
             }
         }
 
@@ -175,7 +214,10 @@ namespace RILnetDemo
                 string sError = RilErrorClass.getRIL_Error(hrRemovePreferredOperator);
                 OnRILmessage("RemovePreferredOperator FAILED! hResult=" + hrRemovePreferredOperator + "\r\n");
             }
-
+            else
+            {
+                requestEntry re = new requestEntry(hrRemovePreferredOperator, "removePreferredOperator: "+iIndex.ToString());
+            }
         }
 
         public void registerOnNetwork(RIL_OPSELMODE sMode, RILOPERATORNAMES operatorName){
@@ -186,10 +228,11 @@ namespace RILnetDemo
             try
             {
                 hrRegisterOnNetwork = Ril.RegisterOnNetwork(hRil, sMode, ref operatorName);
+                requestEntry re = new requestEntry(hrRegisterOnNetwork, "registerOnNetwork("+operatorName.GetLongName()+")");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Excpetion in RegisterOnNetwork: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Exception in RegisterOnNetwork: " + ex.Message);
             }
             if (hrRegisterOnNetwork < 0)
             {
@@ -198,6 +241,47 @@ namespace RILnetDemo
             }
         }
 
+        #region requestList
+        public class requestEntry
+        {
+            public static Dictionary<int, requestEntry> pendingRequests = new Dictionary<int,requestEntry>();
+            int requestID;
+            string requestString;
+            public requestEntry(int id, string str)
+            {
+                requestID = id;
+                requestString = str;
+                pendingRequests.Add(id, this);
+                dump();
+            }
+            public override string ToString()
+            {
+                return requestString;
+            }
+            public static void remove(int reqID)
+            {
+                requestEntry v;
+                if (pendingRequests.TryGetValue(reqID, out v))
+                    pendingRequests.Remove(reqID);
+                dump();
+            }
+            public static requestEntry getEntry(int reqID)
+            {
+                requestEntry v;
+                if (pendingRequests.TryGetValue(reqID, out v))
+                    return v;
+                else
+                    return new requestEntry(0, "unknown");
+            }
+            public static void dump(){
+                System.Diagnostics.Debug.WriteLine("--- pending START---");
+                foreach(KeyValuePair<int, requestEntry> kvp in pendingRequests)
+                    System.Diagnostics.Debug.WriteLine(kvp.Key.ToString() +":"+ kvp.Value.ToString());
+                System.Diagnostics.Debug.WriteLine("--- pending END  ---");
+            }
+        }
+
+        #endregion
         public void Dispose()
         {
             if (hRil != IntPtr.Zero){
@@ -277,11 +361,18 @@ namespace RILnetDemo
             uint dwParam)
         {
             if (dwCode != (uint)RilNET.RIL_FUNCRESULT.RIL_RESULT_OK)
-                System.Diagnostics.Debug.WriteLine("#### CALL failed! #### :" + hrCmdID.ToString()+"\r\n");
+            {
+                System.Diagnostics.Debug.WriteLine("#### CALL failed! #### :" + hrCmdID.ToString() + "\r\n");
+                OnRILmessage("#### CALL failed! #### :" + hrCmdID.ToString() +"/"+ requestEntry.getEntry(hrCmdID).ToString());
+            }
+            requestEntry.remove(hrCmdID);
 
             if (hrRegisterOnNetwork == hrCmdID)
             {
-                OnRILmessage("set preferred Operator with dwCode=" + dwCode.ToString());
+                if (dwCode == (uint)RilNET.RIL_FUNCRESULT.RIL_RESULT_OK)
+                    OnRILmessage("set preferred Operator OK");
+                else
+                    OnRILmessage("set preferred Operator returned " + dwCode.ToString());
             }
 
             if (hrRemovePreferredOperator == hrCmdID)
@@ -293,7 +384,7 @@ namespace RILnetDemo
             {
                 RILOPERATORINFO[] pOperInfo = getRILOPERATORINFO(lpData, cbData);
 
-                _operatorInfoPreferredList.Clear(); //arrayHelper<OperatorInfo>.ToList(new OperatorInfo(pOperInfo));// pOperInfo.ToList();
+                _operatorInfoPreferredList=new List<OperatorInfo>(); //arrayHelper<OperatorInfo>.ToList(new OperatorInfo(pOperInfo));// pOperInfo.ToList();
 
                 OnRILmessage("Preferred Operator List:\r\n======================\r\n");
                 foreach (RILOPERATORINFO oi in pOperInfo)
@@ -414,38 +505,87 @@ namespace RILnetDemo
             uint dwParam)
         {
             RIL_NCLASS dwClass = ((RIL_NCLASS)dwCode & RIL_NCLASS.ALL);
+            Int32 i32=0;
 
-            OnRILmessage("NotifyCallback: " + dwClass.ToString());
-
-            switch ((RIL_NOTIFY_RADIOSTATE)dwCode)
+            switch ((RIL_NCLASS)dwClass)
             {
-                case RIL_NOTIFY_RADIOSTATE.RADIOEQUIPMENTSTATECHANGED:
+                case RIL_NCLASS.RADIOSTATE:
+                    OnRILmessage("NotifyCallback: " + dwClass.ToString());
+                    switch ((RIL_NOTIFY_RADIOSTATE)dwCode)
                     {
-                        RILEQUIPMENTSTATE pState = (RILEQUIPMENTSTATE)Marshal.PtrToStructure(lpData, typeof(RILEQUIPMENTSTATE));
+                        case RIL_NOTIFY_RADIOSTATE.RADIOEQUIPMENTSTATECHANGED:
+                            {
+                                RILEQUIPMENTSTATE pState = (RILEQUIPMENTSTATE)Marshal.PtrToStructure(lpData, typeof(RILEQUIPMENTSTATE));
 
-                        OnRILmessage(String.Format("Radio Support: {0}; equipment State: {1}; ready State: {2}\r\n",
-                                       pState.dwRadioSupport, pState.dwEqState, pState.dwReadyState));
+                                OnRILmessage(String.Format("Radio Support: {0}; equipment State: {1}; ready State: {2}\r\n",
+                                               pState.dwRadioSupport, pState.dwEqState, pState.dwReadyState));
 
-                        break;
-                    }
-                case RIL_NOTIFY_RADIOSTATE.RADIOPRESENCECHANGED:
+                                break;
+                            }
+                        case RIL_NOTIFY_RADIOSTATE.RADIOPRESENCECHANGED:
+                            {
+                                RIL_RADIOPRESENCE dwPresence = (RIL_RADIOPRESENCE)Marshal.ReadInt32(lpData);
+
+                                switch (dwPresence)
+                                {
+                                    case RIL_RADIOPRESENCE.NOTPRESENT:
+                                        OnRILmessage("Radio module is not present\r\n");
+                                        break;
+                                    case RIL_RADIOPRESENCE.PRESENT:
+                                        Debug.WriteLine("Radio module is present\r\n");
+                                        OnRILmessage("Radio module is present\r\n");
+                                        break;
+                                }
+
+                                break;
+                            }
+                    }//switch RIL_NOTIFY_RADIOSTATE
+                    break; // RADIOSTATE
+                case RIL_NCLASS.NETWORK:
+                    OnRILmessage("NotifyCallback: " + dwClass.ToString());
+                    switch ((RIL_NOTIFY_NETWORK)dwCode)
                     {
-                        RIL_RADIOPRESENCE dwPresence = (RIL_RADIOPRESENCE)Marshal.ReadInt32(lpData);
-
-                        switch (dwPresence)
-                        {
-                            case RIL_RADIOPRESENCE.NOTPRESENT:
-                                OnRILmessage("Radio module is not present\r\n");
-                                break;
-                            case RIL_RADIOPRESENCE.PRESENT:
-                                Debug.WriteLine("Radio module is present\r\n");
-                                OnRILmessage("Radio module is present\r\n");
-                                break;
-                        }
-
-                        break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_CALLMETER:
+                            i32 = lpData.ToInt32();
+                            OnRILmessage("RIL_NOTIFY_CALLMETER: "+i32.ToString());
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_CALLMETERMAXREACHED:
+                            OnRILmessage("RIL_NOTIFY_CALLMETERMAXREACHED");
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_LOCATIONUPDATE:
+                            RilLocationInfo loc = new RilLocationInfo(lpData);
+                            OnRILmessage("RIL_NOTIFY_LOCATIONUPDATE: " + loc.LocationAreaCode.ToString() +", "+ loc.CellID.ToString());
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_GPRSCONNECTIONSTATUS:
+                            OnRILmessage("RIL_NOTIFY_GPRSCONNECTIONSTATUS");
+                            RilGPRSContextActivated context = new RilGPRSContextActivated(lpData);
+                            OnRILmessage("RIL_NOTIFY_GPRSCONNECTIONSTATUS: " + context.contextID.ToString() + ", "+ context.activated.ToString());
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_GPRSREGSTATUSCHANGED:
+                            i32 = lpData.ToInt32();
+                            OnRILmessage("RIL_NOTIFY_GPRSREGSTATUSCHANGED: " + ((RIL_REGISTRATION_CONSTANTS)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_REGSTATUSCHANGED:
+                            i32 = lpData.ToInt32();
+                            OnRILmessage("RIL_NOTIFY_REGSTATUSCHANGED: " + ((RIL_REGISTRATION_CONSTANTS)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_SYSTEMCAPSCHANGED:
+                            i32=Convert.ToInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_SYSTEMCAPSCHANGED: "+ ((RIL_NOTIFY_SYSTEMCAPS)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_NETWORK.RIL_NOTIFY_SYSTEMCHANGED:
+                            i32 = lpData.ToInt32();
+                            OnRILmessage("RIL_NOTIFY_SYSTEMCHANGED: " + ((RIL_NOTIFY_SYSTEMCAPSCHANGED)i32).ToString());
+                            break;
                     }
-            }
+                    break;
+                case RIL_NCLASS.FUNCRESULT:
+                    OnRILmessage("NotifyCallback: " + dwClass.ToString());
+                    break;
+                default:
+                    OnRILmessage("NotifyCallback: " + dwClass.ToString());
+                    break;
+            }//RIL_NCLASS
         }
 
         //helpers

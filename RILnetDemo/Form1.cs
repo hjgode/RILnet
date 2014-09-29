@@ -35,10 +35,10 @@ namespace RILnetDemo
                 {
                     if (e._object == null)
                         return;
-                    List<RilNET.RILOPERATORINFO> oiList = (List<RilNET.RILOPERATORINFO>)e._object;
-                    foreach (RilNET.RILOPERATORINFO oi in oiList)
+                    List<RilNET.OperatorInfo> oiList = (List<RilNET.OperatorInfo>)e._object;
+                    foreach (RilNET.OperatorInfo oi in oiList)
                     {
-                        addItem(new RilNET.OperatorInfo(oi));
+                        addItem(oi.ToString());
                     }
                 }
                 catch (Exception ex)
@@ -161,7 +161,7 @@ namespace RILnetDemo
             if (rilTest.getCurrentOperator())
                 addLog("getCurrentOperator() request OK\n");
             else
-                addLog("getCurrentOperator() request FAILED\n");
+                addLog("getCurrentOperator() request FAILED\n");            
         }
 
         private void btnPhoneRefresh_Click(object sender, EventArgs e)

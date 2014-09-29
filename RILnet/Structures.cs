@@ -545,16 +545,30 @@ namespace RilNET
         /// Specifies valid parameters. Must be one or a combination of the <see cref="T:RilNET.RIL_PARAM_OI">RIL_PARAM_OI</see> parameter constants.
         /// </summary>
         public RIL_PARAM_OI dwParams;
-  
+        public enum RIL_PARAM_OI_Type
+        {
+            RIL_PARAM_OI_INDEX = 0x01,//	The dwIndex member of the structure is valid.
+            RIL_PARAM_OI_STATUS = 0x02,//	The dwStatus member of the structure is valid.
+            RIL_PARAM_OI_NAMES = 0x04,//	The ronNames member of the structure is valid.
+            RIL_PARAM_OI_ALL = 0x07,//	All members of the structure are valid.
+        }
+
         /// <summary>
         /// Specifies the index, if applicable.
         /// </summary>
         public RIL_PREFOPINDEX dwIndex;
-        
+        const Int32 RIL_PREFOPINDEX_FIRSTAVAILABLE = -1 /*0xffffffff*/;      // @constdefine Used to specify that a preferred operator is
+
         /// <summary>
         /// Specifies the registration status, if applicable.
         /// </summary>
         public uint dwStatus;
+        public enum dwStatus_Type{
+        RIL_OPSTATUS_UNKNOWN=0x00,//    Unknown status.
+        RIL_OPSTATUS_AVAILABLE=0x01,//  Operator is available.
+        RIL_OPSTATUS_CURRENT=0x02,//    Operator is current.
+        RIL_OPSTATUS_FORBIDDEN=0x03,//  Operator is forbidden.
+        }
 
         /// <summary>
         /// Representations of an operator.
