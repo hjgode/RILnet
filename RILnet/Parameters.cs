@@ -435,7 +435,7 @@ namespace RilNET
     /// </summary>
     /// <seealso cref="T:RilNET.RILSIGNALQUALITY"/>
     [Flags]
-    public enum RIL_PARAM_SQ : uint
+    public enum RIL_PARAM_SQ : int
     {
         /// <summary>
         /// The <see cref="P:RilNET.RILSIGNALQUALITY.nSignalStrength">nSignalStrength</see> member of the structure is valid.

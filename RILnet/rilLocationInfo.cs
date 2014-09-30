@@ -19,8 +19,7 @@ namespace RilNET
         public UInt32 CellID = 0;
         public RilLocationInfo(IntPtr pRilLocationInfo)
         {
-            RilLocationInfoStruct info=new RilLocationInfoStruct();
-            Marshal.PtrToStructure(pRilLocationInfo, info);
+            RilLocationInfoStruct info=(RilLocationInfoStruct)Marshal.PtrToStructure(pRilLocationInfo, typeof(RilLocationInfoStruct));
             LocationAreaCode = info.dwLocationAreaCode;
             CellID = info.dwCellID;
         }

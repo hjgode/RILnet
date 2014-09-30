@@ -52,21 +52,27 @@ namespace RILnetDemo
         private bool init()
         {
             bool bRet = false;
-            if (hRil == IntPtr.Zero)
+            try
             {
-                hr = Ril.Initialize(1, new RILRESULTCALLBACK(RilResultCallback), new RILNOTIFYCALLBACK(RilNotifyCallback), RIL_NCLASS.ALL, 0, out hRil);
-
-                if (hr == 0)
+                if (hRil == IntPtr.Zero)
                 {
-                    OnRILmessage(new RILnetEventArgs("RIL Initialize OK\r\n"));
-                    bRet = true;
+                    hr = Ril.Initialize(1, new RILRESULTCALLBACK(RilResultCallback), new RILNOTIFYCALLBACK(RilNotifyCallback), RIL_NCLASS.ALL, 0, out hRil);
+
+                    if (hr == 0)
+                    {
+                        OnRILmessage(new RILnetEventArgs("RIL Initialize OK\r\n"));
+                        bRet = true;
+                    }
+                    else
+                        OnRILmessage(new RILnetEventArgs("RIL Initialize FAILED: 0x" + hr.ToString("x") + "\r\n"));
                 }
                 else
-                    OnRILmessage(new RILnetEventArgs("RIL Initialize FAILED: 0x" + hr.ToString("x") + "\r\n"));
+                    bRet = true;
             }
-            else
-                bRet = true;
-
+            catch (Exception ex)
+            {
+                throw;
+            }
             return bRet;
         }
 
@@ -539,14 +545,16 @@ namespace RILnetDemo
 
                                 break;
                             }
+                        case RIL_NOTIFY_RADIOSTATE.RIL_NOTIFY_RADIORESET:
+                            OnRILmessage("Radio module has been reset!\r\n");
+                            break;
                     }//switch RIL_NOTIFY_RADIOSTATE
                     break; // RADIOSTATE
                 case RIL_NCLASS.NETWORK:
-                    OnRILmessage("NotifyCallback: " + dwClass.ToString());
                     switch ((RIL_NOTIFY_NETWORK)dwCode)
                     {
                         case RIL_NOTIFY_NETWORK.RIL_NOTIFY_CALLMETER:
-                            i32 = lpData.ToInt32();
+                            i32 = Marshal.ReadInt32(lpData);
                             OnRILmessage("RIL_NOTIFY_CALLMETER: "+i32.ToString());
                             break;
                         case RIL_NOTIFY_NETWORK.RIL_NOTIFY_CALLMETERMAXREACHED:
@@ -562,25 +570,111 @@ namespace RILnetDemo
                             OnRILmessage("RIL_NOTIFY_GPRSCONNECTIONSTATUS: " + context.contextID.ToString() + ", "+ context.activated.ToString());
                             break;
                         case RIL_NOTIFY_NETWORK.RIL_NOTIFY_GPRSREGSTATUSCHANGED:
-                            i32 = lpData.ToInt32();
+                            i32 = Marshal.ReadInt32(lpData);
                             OnRILmessage("RIL_NOTIFY_GPRSREGSTATUSCHANGED: " + ((RIL_REGISTRATION_CONSTANTS)i32).ToString());
                             break;
                         case RIL_NOTIFY_NETWORK.RIL_NOTIFY_REGSTATUSCHANGED:
-                            i32 = lpData.ToInt32();
+                            i32 = Marshal.ReadInt32(lpData);
                             OnRILmessage("RIL_NOTIFY_REGSTATUSCHANGED: " + ((RIL_REGISTRATION_CONSTANTS)i32).ToString());
                             break;
                         case RIL_NOTIFY_NETWORK.RIL_NOTIFY_SYSTEMCAPSCHANGED:
-                            i32=Convert.ToInt32(lpData);
+                            i32 = Marshal.ReadInt32(lpData);
                             OnRILmessage("RIL_NOTIFY_SYSTEMCAPSCHANGED: "+ ((RIL_NOTIFY_SYSTEMCAPS)i32).ToString());
                             break;
                         case RIL_NOTIFY_NETWORK.RIL_NOTIFY_SYSTEMCHANGED:
-                            i32 = lpData.ToInt32();
-                            OnRILmessage("RIL_NOTIFY_SYSTEMCHANGED: " + ((RIL_NOTIFY_SYSTEMCAPSCHANGED)i32).ToString());
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_SYSTEMCHANGED: " + ((RIL_NOTIFY_SYSTEMCHANGED)i32).ToString());
+                            break;
+                        default:
+                            OnRILmessage("NotifyCallback: " + "unknown code="+dwCode.ToString());
                             break;
                     }
                     break;
                 case RIL_NCLASS.FUNCRESULT:
                     OnRILmessage("NotifyCallback: " + dwClass.ToString());
+                    break;
+                case RIL_NCLASS.MISC:
+                    switch ((RIL_NOTIFY_MISC)dwCode)
+                    {
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_SIMNOTACCESSIBLE:
+                            //lpData=null
+                            OnRILmessage("RIL_NOTIFY_SIMNOTACCESSIBLE: " + ((RIL_NOTIFY_MISC)dwCode).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_DTMFSIGNAL:
+                            char c = Convert.ToChar(Marshal.ReadByte(lpData));
+                            OnRILmessage("RIL_NOTIFY_DTMFSIGNAL: " + ((RIL_NOTIFY_MISC)dwCode).ToString() + ":" + c.ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_GPRSCLASS_NETWORKCHANGED:
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_GPRSCLASS_NETWORKCHANGED: " + ((RIL_GPRSCLASS)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_GPRSCLASS_RADIOCHANGED:
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_GPRSCLASS_RADIOCHANGED: " + ((RIL_GPRSCLASS)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_SIGNALQUALITY:
+                            RilSignalQuality rsq = new RilSignalQuality(lpData);
+                            OnRILmessage("RIL_NOTIFY_SIGNALQUALITY: " + rsq.dump());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_MAINTREQUIRED:
+                            OnRILmessage("RIL_NOTIFY_MAINTREQUIRED");
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_PRIVACYCHANGED:
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_PRIVACYCHANGED: " + ((RIL_CALLPRIVACY)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_SIM_DATACHANGE:
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_SIM_DATACHANGE: " + ((RIL_SIM_DATACHANGE)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_ATLOGGING:
+                            OnRILmessage("RIL_NOTIFY_ATLOGGING: " + "AT command logging data is available");
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_SIMSTATUSCHANGED:
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_SIMSTATUSCHANGED: " + ((RIL_SIMSTATUSCHANGED)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_EONS:
+                            OnRILmessage("RIL_NOTIFY_EONS: " + "Enhanced Operator Name String (EONS) information is available or updated");
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_SIMSECURITYSTATUS:
+                            RIL_SIMSECURITYSTATE sss= (RIL_SIMSECURITYSTATE)Marshal.PtrToStructure(lpData, typeof(RIL_SIMSECURITYSTATE));
+                            OnRILmessage("RIL_NOTIFY_SIMSECURITYSTATUS: " + ((RIL_SIMSECURITYSTATE)sss).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_LINESTATE:
+                            i32 = Marshal.ReadInt32(lpData);
+                            OnRILmessage("RIL_NOTIFY_LINESTATE: " + ((RIL_LINE_STAT)i32).ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_BEARERSVCINFO:
+                            RILBEARERSVCINFO bsi = (RILBEARERSVCINFO)Marshal.PtrToStructure(lpData, typeof(RILBEARERSVCINFO));
+                            OnRILmessage("RIL_NOTIFY_SIMSECURITYSTATUS: " + bsi.ToString());
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_DATACOMPINFO:
+                            ///TODO: see RILDATACOMPINFO and 
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_EQUIPMENTINFO:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_ERRORCORRECTIONINFO:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_GPRSADDRESS:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_GPRSATTACHED:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_GPRSCONTEXT:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_GPRSCONTEXTACTIVATED:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_QOSMIN:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_QOSREQ:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_RLPOPTIONS:
+                            break;
+                        case RIL_NOTIFY_MISC.RIL_NOTIFY_NITZ:
+                            RILNITZINFO nitz = (RILNITZINFO)Marshal.PtrToStructure(lpData, typeof(RILNITZINFO));
+                            OnRILmessage("RIL_NOTIFY_NITZ: " + nitz.ToString());
+                            break;
+                    }
                     break;
                 default:
                     OnRILmessage("NotifyCallback: " + dwClass.ToString());
@@ -674,7 +768,7 @@ namespace RILnetDemo
         }
         void OnRILmessage(string s)
         {
-            Debug.Write(s);
+            Debug.WriteLine(s);
             if (this.onRILnetMessage != null)
                 this.onRILnetMessage(this, new RILnetEventArgs(s));
         }

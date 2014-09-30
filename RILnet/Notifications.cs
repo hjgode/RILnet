@@ -91,7 +91,7 @@ namespace RilNET
         RIL_SYSTEMCAPS_ALL = 0x01
     }
 
-    public enum RIL_NOTIFY_SYSTEMCAPSCHANGED : uint
+    public enum RIL_NOTIFY_SYSTEMCHANGED : uint
     {
         RIL_SYSTEMTYPE_NONE = (0x00000000),// @constdegine No Networks in Coverage
         RIL_SYSTEMTYPE_IS95A = (0x00000001),// @constdefine IS-95A network support (Low Packet, or Circuit Switched Service)
@@ -195,6 +195,43 @@ namespace RilNET
         /// <summary>
         /// Carries a DWORD with one of the <see cref="T:RIL_RADIOPRESENCE">RIL_RADIOPRESENCE</see> values. These constants indicate that a radio module or driver has been changed (for example, removed or inserted).
         /// </summary>
-        RADIOPRESENCECHANGED = 0x00000002 | RIL_NCLASS.RADIOSTATE
+        RADIOPRESENCECHANGED = 0x00000002 | RIL_NCLASS.RADIOSTATE,
+
+        RIL_NOTIFY_RADIORESET = 0x00000003 | RIL_NCLASS.RADIOSTATE,
     }
+
+    // -----------------------------------------------------------------------------
+    // @constants Notification Misc | Miscellaneous notifications (RIL_NCLASS_MISC)
+    public enum RIL_NOTIFY_MISC :uint{
+        RIL_NOTIFY_SIMNOTACCESSIBLE                 =(0x00000001 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine SIM card has been removed or has failed to respond; lpData is NULL
+        RIL_NOTIFY_DTMFSIGNAL                       =(0x00000002 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine A DTMF signal has been detected; lpData points to char
+        RIL_NOTIFY_GPRSCLASS_NETWORKCHANGED         =(0x00000003 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine Network has indicated a change in GPRS class
+                                                                                     // lpData points to a DWORD containing the new RIL_GPRSCLASS_* value
+        RIL_NOTIFY_GPRSCLASS_RADIOCHANGED           =(0x00000004 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine The radio has indicated a change in GPRS class
+                                                                                     // lpData points to a DWORD containing the new RIL_GPRSCLASS_* value
+        RIL_NOTIFY_SIGNALQUALITY                    =(0x00000005 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine Signal Quality Notification
+                                                                                     // lpData points to a RILSIGNALQUALITY structure
+        RIL_NOTIFY_MAINTREQUIRED                    =(0x00000006 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine BS notification that MS requires servicing; lpdata is NULL
+        RIL_NOTIFY_PRIVACYCHANGED                   =(0x00000007 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine Call Privacy Status; lpData points to DWORD of value RIL_CALLPRIVACY_*
+        RIL_NOTIFY_SIM_DATACHANGE                   =(0x00000008 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine data change notification; lpData points to DWORD of value RIL_SIMDATACHANGE_*
+        RIL_NOTIFY_ATLOGGING                        =(0x00000009 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine at command log data present
+        RIL_NOTIFY_SIMSTATUSCHANGED                 =(0x0000000A | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine SIM card state has changed. Carries a DWORD (RIL_SIMSTATUSCHANGED_*) with the current state.
+                                                                                     // Notification is sent only when encountering error conditions from the radio.
+        RIL_NOTIFY_EONS                             =(0x0000000B | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine EONS information ready or updated; lpData is NULL
+        RIL_NOTIFY_SIMSECURITYSTATUS                =(0x0000000C | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine SIM security status change; lpData points to LPRILSIMSECURITYSTATUS
+        RIL_NOTIFY_LINESTATE                        =(0x0000000D | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine line state; lpData points to a DWORD of value RIL_LINESTAT_*
+        RIL_NOTIFY_BEARERSVCINFO                    =(0x0000000E | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine bearer service information; lpData points to LPRILBEARERSVCINFO
+        RIL_NOTIFY_DATACOMPINFO                     =(0x0000000F | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine data compression information; lpData points to LPRILDATACOMPINFO
+        RIL_NOTIFY_EQUIPMENTINFO                    =(0x00000010 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine equipment information; lpData points to LPRILEQUIPMENTINFO
+        RIL_NOTIFY_ERRORCORRECTIONINFO              =(0x00000011 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine error correction information; lpData points to LPRILERRORCORRECTIONINFO
+        RIL_NOTIFY_GPRSADDRESS                      =(0x00000012 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine GPRS address; lpData points to an array of WCHAR values that indicate the address
+        RIL_NOTIFY_GPRSATTACHED                     =(0x00000013 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine GPRS attach state; lpData points to a BOOL that indicates attach state
+        RIL_NOTIFY_GPRSCONTEXT                      =(0x00000014 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine GPRS context list; lpData points to LPRILGPRSCONTEXT
+        RIL_NOTIFY_GPRSCONTEXTACTIVATED             =(0x00000015 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine GPRS context activated list; lpData points to LPRILGPRSCONTEXTACTIVATED 
+        RIL_NOTIFY_QOSMIN                           =(0x00000016 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine minimum quality of service profile ; lpData points to LPRILGPRSQOSPROFILE
+        RIL_NOTIFY_QOSREQ                           =(0x00000017 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine requested quality of service profile ; lpData points to LPRILGPRSQOSPROFILE
+        RIL_NOTIFY_RLPOPTIONS                       =(0x00000018 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine requested quality of service profile ; lpData points to LPRILRLPINFO
+        RIL_NOTIFY_NITZ                             =(0x00000019 | NOTIFICATIONCLASSES.RIL_NCLASS_MISC), // @constdefine NITZ Date/Time notification. lpData points to a RILNITZINFO structure.
+    }
+
 }

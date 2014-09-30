@@ -23,8 +23,7 @@ namespace RilNET
         public bool activated;
         public RilGPRSContextActivated(IntPtr pRilGPRSContextActivatedStruct)
         {
-            RilGPRSContextActivatedStruct info = new RilGPRSContextActivatedStruct();
-            Marshal.PtrToStructure(pRilGPRSContextActivatedStruct, info);
+            RilGPRSContextActivatedStruct info = (RilGPRSContextActivatedStruct)Marshal.PtrToStructure(pRilGPRSContextActivatedStruct, typeof(RilGPRSContextActivatedStruct));
             contextID = info.dwContextID;
             activated = info.fActivated;
         }

@@ -23,4 +23,14 @@ namespace RilNET
             return Encoding.ASCII.GetString(data, 0, data.Length).Replace("\0", "");
         }
     }
+
+    internal static class FlagSettings{
+        public static bool isFlagSet(object o, object flag)
+        {
+            bool b = false;
+            if (((Int32)o & (Int32)flag) != 0)
+                b = true;
+            return b;
+        }
+    }
 }

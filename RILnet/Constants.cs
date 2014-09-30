@@ -519,4 +519,108 @@ namespace RilNET
         /// </summary>
         RIL_RESULT_RADIOOFF = (0x00000009 | NOTIFICATIONCLASSES.RIL_NCLASS_FUNCRESULT)  
     }
+    public enum RIL_GPRSCLASS : uint
+    {
+        RIL_GPRSCLASS_UNKNOWN = (0x00000000), // @constdefine GPRS class unknown
+        RIL_GPRSCLASS_GSMANDGPRS = (0x00000001), // @constdefine Simultaneous voice and GPRS data
+        RIL_GPRSCLASS_GSMORGPRS = (0x00000002), // @constdefine Simultaneous voice and GPRS traffic channel, one or other data
+        RIL_GPRSCLASS_GSMORGPRS_EXCLUSIVE = (0x00000004), // @constdefine Either all voice or all GPRS, both traffic channels unmonitored
+        RIL_GPRSCLASS_GPRSONLY = (0x00000008), // @constdefine Only GPRS
+        RIL_GPRSCLASS_GSMONLY = (0x00000010), // @constdefine Only circuit switched voice and data
+        RIL_GPRSCLASS_ALL = (0x0000001f)
+    }
+
+    public enum RIL_CALLPRIVACY : uint
+    {
+        RIL_CALLPRIVACY_STANDARD = 0x01,  // Enhanced call privacy is off.
+        RIL_CALLPRIVACY_ENHANCED = 0x02,  // Enhanced call privacy is on.
+    }
+    public enum RIL_SIM_DATACHANGE:uint{
+        RIL_SIM_DATACHANGE_MSISDNS                        =(0xffffffff),
+        RIL_SIM_DATACHANGE_ALL_SIMRECORDS                 =(0xfffffffe),
+        RIL_SIM_DATACHANGE_ALL_SIMPB                      =(0xfffffffd),
+        RIL_SIM_DATACHANGE_ALL                            =(0xfffffffc),
+    }
+    public enum RIL_SIMSTATUSCHANGED:uint{
+        RIL_SIMSTATUSCHANGED_NONE                   =(0x00000000),      // @constdefine No status yet
+        RIL_SIMSTATUSCHANGED_FULL                   =(0x00000001),      // @constdefine SIM card memory is full
+        RIL_SIMSTATUSCHANGED_NO_SIM                 =(0x00000002),      // @constdefine No SIM card available
+        RIL_SIMSTATUSCHANGED_INVALID                =(0x00000004),      // @constdefine SIM card is invalid
+        RIL_SIMSTATUSCHANGED_BLOCKED                =(0x00000008),      // @constdefine SIM card is blocked
+    }
+    public enum RIL_LOCKEDSTATE:uint
+    {
+        RIL_LOCKEDSTATE_UNKNOWN = (0x00000000), // @constdefine Locking state unknown
+        RIL_LOCKEDSTATE_READY = (0x00000001), // @constdefine ME not locked
+        RIL_LOCKEDSTATE_SIM_PIN = (0x00000002), // @constdefine ME awaiting PIN
+        RIL_LOCKEDSTATE_SIM_PUK = (0x00000003), // @constdefine ME awaiting PUK
+        RIL_LOCKEDSTATE_PH_SIM_PIN = (0x00000004), // @constdefine ME awaiting phone-to-sim password
+        RIL_LOCKEDSTATE_PH_FSIM_PIN = (0x00000005), // @constdefine ME awaiting phone-to-first-sim password
+        RIL_LOCKEDSTATE_PH_FSIM_PUK = (0x00000006), // @constdefine ME awaiting phone-to-first-sim PUK
+        RIL_LOCKEDSTATE_SIM_PIN2 = (0x00000007), // @constdefine ME awaiting PIN2/CHV2
+        RIL_LOCKEDSTATE_SIM_PUK2 = (0x00000008), // @constdefine ME awaiting PUK2
+        RIL_LOCKEDSTATE_PH_NET_PIN = (0x00000009), // @constdefine ME awaiting network personilzation PIN
+        RIL_LOCKEDSTATE_PH_NET_PUK = (0x0000000a), // @constdefine ME awaiting network personilzation PUK
+        RIL_LOCKEDSTATE_PH_NETSUB_PIN = (0x0000000b), // @constdefine ME awaiting network subset personilzation PIN
+        RIL_LOCKEDSTATE_PH_NETSUB_PUK = (0x0000000c), // @constdefine ME awaiting network subset personilzation PUK
+        RIL_LOCKEDSTATE_PH_SP_PIN = (0x0000000d), // @constdefine ME awaiting service provider PIN
+        RIL_LOCKEDSTATE_PH_SP_PUK = (0x0000000e), // @constdefine ME awaiting service provider PUK
+        RIL_LOCKEDSTATE_PH_CORP_PIN = (0x0000000f), // @constdefine ME awaiting corporate personilzation PIN
+        RIL_LOCKEDSTATE_PH_CORP_PUK = (0x00000010), // @constdefine ME awaiting corporate personilzation PUK
+    }
+    public enum RIL_SIMSECURITYSTATE:uint{
+        RIL_SIMSECURITYSTATE_UNKNOWN                =(0x00000000),      // @constdefine SIM security state unknown
+        RIL_SIMSECURITYSTATE_PINREQUESTED           =(0x00000001),      // @constdefine SIM security state requested PIN
+        RIL_SIMSECURITYSTATE_PINRECEIVED            =(0x00000002),      // @constdefine SIM security state received PIN
+    }
+
+    public enum RIL_LINE_STAT : uint
+    {
+        RIL_LINESTAT_UNKNOWN = (0x00000000), // @constdefine Unknown
+        RIL_LINESTAT_READY = (0x00000001), // @constdefine Line is ready
+        RIL_LINESTAT_UNAVAILABLE = (0x00000002), // @constdefine Line is unavailable
+        RIL_LINESTAT_RINGING = (0x00000003), // @constdefine Incoming call on the line
+        RIL_LINESTAT_CALLINPROGRESS = (0x00000004), // @constdefine Call in progress
+        RIL_LINESTAT_ASLEEP = (0x00000005), // @constdefine Line is asleep
+        RIL_LINESTAT_CONNECTING = (0x00000006), // @constdefine The phone is connecting to a call, but the call is not in progress yet
+    }
+
+    public enum BEARERSVCCONNECTIONELEMENT: uint{
+        RIL_BSVCCE_UNKNOWN                          =(0x00000000),      // @constdefine Bearer service unknown
+        RIL_BSVCCE_TRANSPARENT                      =(0x00000001),      // @constdefine Link layer correction enabled
+        RIL_BSVCCE_NONTRANSPARENT                   =(0x00000002),      // @constdefine No link layer correction present
+        RIL_BSVCCE_BOTH_TRANSPARENT                 =(0x00000003),      // @constdefine Both available, transparent preferred
+        RIL_BSVCCE_BOTH_NONTRANSPARENT              =(0x00000004),      // @constdefine Both available, non-transparent preferred
+    }
+
+    public enum RILBSVCNAME:uint{
+        RIL_BSVCNAME_UNKNOWN                        =(0x00000000)      ,// @constdefine TBD
+        RIL_BSVCNAME_DATACIRCUIT_ASYNC_UDI_MODEM    =(0x00000001)      ,// @constdefine TBD
+        RIL_BSVCNAME_DATACIRCUIT_SYNC_UDI_MODEM     =(0x00000002)      ,// @constdefine TBD
+        RIL_BSVCNAME_PADACCESS_ASYNC_UDI            =(0x00000003)      ,// @constdefine TBD
+        RIL_BSVCNAME_PACKETACCESS_SYNC_UDI          =(0x00000004)      ,// @constdefine TBD
+        RIL_BSVCNAME_DATACIRCUIT_ASYNC_RDI          =(0x00000005)      ,// @constdefine TBD
+        RIL_BSVCNAME_DATACIRCUIT_SYNC_RDI           =(0x00000006)      ,// @constdefine TBD
+        RIL_BSVCNAME_PADACCESS_ASYNC_RDI            =(0x00000007)      ,// @constdefine TBD
+        RIL_BSVCNAME_PACKETACCESS_SYNC_RDI          =(0x00000008)      ,// @constdefine TBD
+    }
+
+    public enum RIL_DATACOMPDIR : uint
+    {
+        RIL_DATACOMPDIR_NONE                        =(0x00000001)      ,// @constdefine No data compression
+        RIL_DATACOMPDIR_TRANSMIT                    =(0x00000002)      ,// @constdefine Data compession when sending
+        RIL_DATACOMPDIR_RECEIVE                     =(0x00000004)      ,// @constdefine Data compession when receiving
+        RIL_DATACOMPDIR_BOTH                        =(0x00000008)      ,// @constdefine Bi-directional data compession
+    }
+
+    public enum RIL_DATACOMP_NEG : uint
+    {
+        RIL_DATACOMP_OPTIONAL                       =(0x00000001),      // @constdefine Data compression optional
+        RIL_DATACOMP_REQUIRED                       =(0x00000002),      // @constdefine Terminal will disconnect if no negotiation
+    }
+    public enum RIL_PARAM_NITZ:uint{
+        RIL_PARAM_NITZ_SYSTEMTIME                   =(0x00000001), // @paramdefine
+        RIL_PARAM_NITZ_TIMEZONEOFFSET               =(0x00000002), // @paramdefine
+        RIL_PARAM_NITZ_DAYLIGHTSAVINGOFFSET         =(0x00000004), // @paramdefine
+    }
 }

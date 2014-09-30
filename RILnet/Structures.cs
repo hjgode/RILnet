@@ -576,50 +576,256 @@ namespace RilNET
         public RILOPERATORNAMES ronNames;
     }
 
+    public class RilSignalQuality
+    {
+        RILSIGNALQUALITY rilsignalquality=new RILSIGNALQUALITY();
+        public RilSignalQuality(IntPtr pStruct)
+        {
+            try
+            {
+                rilsignalquality = (RILSIGNALQUALITY)Marshal.PtrToStructure(pStruct, typeof(RILSIGNALQUALITY));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("exception in RilSignalQuality: " + ex.Message + "\r\n" + ex.InnerException);
+            }
+        }
+        public string dump()
+        {
+            string s = "";
+            s += rilsignalquality.dwParams.ToString("G") + "\r\n";
+
+            if ((rilsignalquality.dwParams & (int)RIL_PARAM_SQ.SIGNALSTRENGTH) != 0 || 
+                (rilsignalquality.dwParams & (int)RIL_PARAM_SQ.ALL) == (int)RIL_PARAM_SQ.ALL )
+                s += " signal: " + rilsignalquality.nSignalStrength.ToString();
+            if ((rilsignalquality.dwParams & (int)RIL_PARAM_SQ.MINSIGNALSTRENGTH) == (int)RIL_PARAM_SQ.MINSIGNALSTRENGTH ||
+                (rilsignalquality.dwParams & (int)RIL_PARAM_SQ.ALL) == (int)RIL_PARAM_SQ.ALL)
+                s += " min signal: " + rilsignalquality.nMinSignalStrength.ToString();
+            if ((rilsignalquality.dwParams & (int)RIL_PARAM_SQ.MAXSIGNALSTRENGTH) == (int)RIL_PARAM_SQ.MAXSIGNALSTRENGTH ||
+                (rilsignalquality.dwParams & (int)RIL_PARAM_SQ.ALL) == (int)RIL_PARAM_SQ.ALL)
+                s += " max signal: " + rilsignalquality.nMaxSignalStrength.ToString();
+            if ((rilsignalquality.dwParams & (int)RIL_PARAM_SQ.LOWSIGNALSTRENGTH) == (int)RIL_PARAM_SQ.LOWSIGNALSTRENGTH ||
+                (rilsignalquality.dwParams & (int)RIL_PARAM_SQ.ALL) == (int)RIL_PARAM_SQ.ALL)
+                s += " low signal: " + rilsignalquality.nLowSignalStrength.ToString();
+            if ((rilsignalquality.dwParams & (int)RIL_PARAM_SQ.HIGHSIGNALSTRENGTH) == (int)RIL_PARAM_SQ.HIGHSIGNALSTRENGTH ||
+                (rilsignalquality.dwParams & (int)RIL_PARAM_SQ.ALL) == (int)RIL_PARAM_SQ.ALL)
+                s += " high signal: " + rilsignalquality.nHighSignalStrength.ToString();
+
+            if ((rilsignalquality.dwParams & (int)RIL_PARAM_SQ.BITERRORRATE) == (int)RIL_PARAM_SQ.BITERRORRATE ||
+                (rilsignalquality.dwParams & (int)RIL_PARAM_SQ.ALL) == (int)RIL_PARAM_SQ.ALL)
+                s += " bit error rate: " + rilsignalquality.dwBitErrorRate.ToString();
+
+            return s;
+        }
+    }
+
+    public class RilBearSvcInfo
+    {
+        RILBEARERSVCINFO svcInfo = new RILBEARERSVCINFO();
+        public RilBearSvcInfo(IntPtr ptr)
+        {
+            svcInfo = (RILBEARERSVCINFO)Marshal.PtrToStructure(ptr, typeof(RILBEARERSVCINFO));
+        }
+        public override string ToString()
+        {
+            string s = "";
+            if (FlagSettings.isFlagSet(BEARSVCINFOPARMS.RIL_PARAM_BSI_CONNECTIONELEMENT, svcInfo.dwParams) ||
+                FlagSettings.isFlagSet(BEARSVCINFOPARMS.RIL_PARAM_BSI_ALL, svcInfo.dwParams))
+                s += "Bear Svc Conn Element: " + svcInfo.dwConnectionElement.ToString() + "\r\n";
+            if (FlagSettings.isFlagSet(BEARSVCINFOPARMS.RIL_PARAM_BSI_SERVICENAME, svcInfo.dwParams) ||
+                FlagSettings.isFlagSet(BEARSVCINFOPARMS.RIL_PARAM_BSI_ALL, svcInfo.dwParams))
+                s += "Bear Svc Name: " + svcInfo.dwServiceName.ToString() + "\r\n";
+            if (FlagSettings.isFlagSet(BEARSVCINFOPARMS.RIL_PARAM_BSI_SPEED, svcInfo.dwParams) ||
+                FlagSettings.isFlagSet(BEARSVCINFOPARMS.RIL_PARAM_BSI_ALL, svcInfo.dwParams))
+                s += "Bear Svc Speed: " + svcInfo.dwSpeed.ToString() + "\r\n";
+
+            return s;
+        }
+    }
+    [StructLayout(LayoutKind.Explicit)]    
+    public struct RILBEARERSVCINFO
+    {
+        [FieldOffset(0)]
+        Int32 cbSize;                              // @field structure size in bytes
+        [FieldOffset(4)]
+        public BEARSVCINFOPARMS dwParams;          // @field indicates valid parameters
+        [FieldOffset(8)]
+        public Int32 dwSpeed;                      // @field offered data speed (protocol dependant)
+        [FieldOffset(12)]
+        public RILBSVCNAME dwServiceName;                // @field type of data service
+        [FieldOffset(16)]
+        public BEARERSVCCONNECTIONELEMENT dwConnectionElement;          // @field indicates transparent or non-transparent connection
+    } 
+    public enum BEARSVCINFOPARMS:int{
+        RIL_PARAM_BSI_SPEED                         =(0x00000001), // @paramdefine
+        RIL_PARAM_BSI_SERVICENAME                   =(0x00000002), // @paramdefine
+        RIL_PARAM_BSI_CONNECTIONELEMENT             =(0x00000004), // @paramdefine
+        RIL_PARAM_BSI_ALL                           =(0x00000007), // @paramdefine
+    }
     /// <summary>
     /// This structure stores signal quality information.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct RILSIGNALQUALITY
+    [StructLayout(LayoutKind.Explicit)]
+    class RILSIGNALQUALITY
     {
         /// <summary>
         /// Structure size, in bytes.
         /// </summary>
-        private uint cbSize;
-
+        [FieldOffset(0)]
+        int dwSize;
         /// <summary>
         /// Specifies valid parameters. Must be one or a combination of the <see cref="T:RilNET.RIL_PARAM_SQ">RIL_PARAM_SQ</see>
         /// </summary>
-        public RIL_PARAM_SQ dwParams;
-
+        [FieldOffset(4)]
+        public int dwParams;
+        [FieldOffset(8)]
         /// <summary>
         /// Specifies the signal strength.
         /// </summary>
         public int nSignalStrength;
-
+        [FieldOffset(12)]
         /// <summary>
         /// Specifies the minimum signal strength.
         /// </summary>
         public int nMinSignalStrength;
-
+        [FieldOffset(16)]
         /// <summary>
         /// Specifies the maximum signal strength.
         /// </summary>
         public int nMaxSignalStrength;
-
+        [FieldOffset(20)]
         /// <summary>
         /// Bit error rate in 1/100 of a percent. Must be one of the bit error rate constants.
         /// </summary>
         public uint dwBitErrorRate;
-
+        [FieldOffset(24)]
         /// <summary>
         /// Indicates a low signal strength.
         /// </summary>
         public int nLowSignalStrength;
-
         /// <summary>
         /// Indicates a high signal strength.
         /// </summary>
+        [FieldOffset(28)]
         public int nHighSignalStrength;
+    } 
+    //public class SignalQuality { 
+        
+    //    public SignalQuality() { } 
+    //    /// Gets or sets the signal strength (RSSI) 
+    //    public int SignalStrength { get ; set ; } 
+    //    /// Gets or sets Minimiun RSSI 
+    //    public int nMinSignalStrength { get ; set ; } 
+    //    /// Gets or sets Max RSSI 
+    //    public int nMaxSignalStrength { get ; set ; } 
+    //    /// Gets or sets Minimiun BER 
+    //    public uint BitErrorRate { get ; set ; } 
+    //    /// Gets or sets Low RSSI 
+    //    public int nLowSignalStrength { get ; set ; } 
+    //    /// Gets or sets High RSSI 
+    //    public int nHighSignalStrength { get ; set ; } 
+    //}
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct RILSIMSECURITYSTATUS
+    {
+        [FieldOffset(0)]
+        UInt32 cbSize;                   // @field structure size in bytes
+        [FieldOffset(4)]
+        RIL_LOCKEDSTATE dwLockedState;            // @field one of RIL_LOCKEDSTATE_*
+        [FieldOffset(8)]
+        RIL_SIMSECURITYSTATE dwSimSecurityState;       // @field one of RIL_SIMSECURITYSTATE_*
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct RILDATACOMPINFO
+    {
+        [FieldOffset(0)]
+        UInt32 cbSize;                       // @field structure size in bytes
+        [FieldOffset(4)]
+        public UInt32 dwParams;                     // @field indicates valid parameters
+        [FieldOffset(8)]
+        public RIL_DATACOMPDIR dwDirection;                  // @field compression in transmit and/or receive direcitons
+        [FieldOffset(12)]
+        public RIL_DATACOMP_NEG dwNegotiation;                // @field compression is required or optional
+        [FieldOffset(16)]
+        public UInt32 dwMaxDictEntries;             // @field maximum number of dictionary entries
+        [FieldOffset(20)]
+        public UInt32 dwMaxStringLength;            // @field maximum string length
+    }
+
+    public class RilNITZInfo
+    {
+        RILNITZINFO nitzInfo = new RILNITZINFO();
+        public RilNITZInfo(IntPtr ptr)
+        {
+            nitzInfo = (RILNITZINFO)Marshal.PtrToStructure(ptr, typeof(RILNITZINFO));
+        }
+        public override string ToString()
+        {
+            string s = "";
+            if(FlagSettings.isFlagSet(nitzInfo.dwParam, RIL_PARAM_NITZ.RIL_PARAM_NITZ_DAYLIGHTSAVINGOFFSET))
+                s+="DST offset=" + nitzInfo.DaylightSavingOffsetMinutes.ToString()+"\r\n";
+            if (FlagSettings.isFlagSet(nitzInfo.dwParam, RIL_PARAM_NITZ.RIL_PARAM_NITZ_SYSTEMTIME))
+                s += "time: " + nitzInfo.SysTime.ToString() + "\r\n";
+            if (FlagSettings.isFlagSet(nitzInfo.dwParam, RIL_PARAM_NITZ.RIL_PARAM_NITZ_TIMEZONEOFFSET))
+                s += "TZ offset=" +nitzInfo.TimeZoneOffsetMinutes.ToString() + "\r\n";
+            return s;
+        }
+    }
+    [StructLayout(LayoutKind.Explicit)]
+    public struct RILNITZINFO{
+        [FieldOffset(0)]
+        UInt32  cbSize;             // size of this struct.
+        [FieldOffset(4)]
+        public RIL_PARAM_NITZ dwParam;           // valid fields RIL_PARAM_NITZ_
+        [FieldOffset(8)]
+        public UInt32 dwNotificationCode; // type of notifcation RIL_NOTIFY_NITZ
+        [FieldOffset(12)]
+        public int TimeZoneOffsetMinutes;// Indicates the time zone offset +/-
+        [FieldOffset(16)]
+        public int DaylightSavingOffsetMinutes; // Indicates the daylight saving offset in minutes
+        [FieldOffset(20)]
+        public SYSTEMTIME SysTime;        // If available from network
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SYSTEMTIME
+    {
+        [MarshalAs(UnmanagedType.U2)]
+        public short Year;
+        [MarshalAs(UnmanagedType.U2)]
+        public short Month;
+        [MarshalAs(UnmanagedType.U2)]
+        public short DayOfWeek;
+        [MarshalAs(UnmanagedType.U2)]
+        public short Day;
+        [MarshalAs(UnmanagedType.U2)]
+        public short Hour;
+        [MarshalAs(UnmanagedType.U2)]
+        public short Minute;
+        [MarshalAs(UnmanagedType.U2)]
+        public short Second;
+        [MarshalAs(UnmanagedType.U2)]
+        public short Milliseconds;
+
+        public SYSTEMTIME(DateTime dt)
+        {
+            dt = dt.ToUniversalTime();  // SetSystemTime expects the SYSTEMTIME in UTC
+            Year = (short)dt.Year;
+            Month = (short)dt.Month;
+            DayOfWeek = (short)dt.DayOfWeek;
+            Day = (short)dt.Day;
+            Hour = (short)dt.Hour;
+            Minute = (short)dt.Minute;
+            Second = (short)dt.Second;
+            Milliseconds = (short)dt.Millisecond;
+        }
+        public override string ToString()
+        {
+            return (string.Format("{0:02}.{1:02}.{2:04} {3:02}:{4:02}:{5:02}:{6:02}",
+                Day, Month, Year,
+                Hour, Minute, Second, Milliseconds));
+        }
     }
 }
